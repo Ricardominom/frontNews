@@ -16,7 +16,7 @@ const HomePage: React.FC = () => {
       {/* Results */}
       {state.currentAnalysis && (
         <div className="animate-fade-in">
-          <SentimentResults analysis={state.currentAnalysis} />
+          <SentimentResults analysis={state.currentAnalysis} showTitle={true} />
         </div>
       )}
     </div>

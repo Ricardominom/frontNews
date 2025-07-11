@@ -4,11 +4,14 @@ import { useNews } from '../context/NewsContext';
 import { useNewsApi } from '../hooks/useNewsApi';
 import { NewsAnalysis } from '../types';
 import Card from './ui/Card';
+import Modal from './ui/Modal';
 import SentimentIcon from './SentimentIcon';
+import SentimentResults from './SentimentResults';
 
 const PreviousAnalyses: React.FC = () => {
   const { state } = useNews();
   const { fetchPreviousAnalyses } = useNewsApi();
+  const [selectedAnalysis, setSelectedAnalysis] = useState<NewsAnalysis | null>(null);
 
   useEffect(() => {
     fetchPreviousAnalyses();
@@ -37,6 +40,14 @@ const PreviousAnalyses: React.FC = () => {
     );
   };
 
+  const handleAnalysisClick = (analysis: NewsAnalysis) => {
+    setSelectedAnalysis(analysis);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedAnalysis(null);
+  };
+
   if (state.previousAnalyses.length === 0) {
     return (
       <Card title="Análisis Previos">
@@ -62,7 +73,8 @@ const parsePercentage = (value?: string) => {
           return (
             <div 
               key={analysis._id} 
-              className="p-4 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors"
+              className="p-4 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer"
+              onClick={() => handleAnalysisClick(analysis)}
             >
               <div className="flex items-start justify-between space-x-4">
                 <div className="flex-1">
@@ -107,6 +119,19 @@ const parsePercentage = (value?: string) => {
           );
         })}
       </div>
+
+      {/* Modal for detailed analysis */}
+      <Modal
+        isOpen={!!selectedAnalysis}
+        onClose={handleCloseModal}
+        title={`Análisis detallado: ${selectedAnalysis?.keyword}`}
+      >
+        {selectedAnalysis && (
+          <div className="p-6">
+            <SentimentResults analysis={selectedAnalysis} />
+          </div>
+        )}
+      </Modal>
     </Card>
   );
 };

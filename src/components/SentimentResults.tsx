@@ -6,9 +6,10 @@ import Card from './ui/Card';
 
 interface SentimentResultsProps {
   analysis: NewsAnalysis;
+  showTitle?: boolean;
 }
 
-const SentimentResults: React.FC<SentimentResultsProps> = ({ analysis }) => {
+const SentimentResults: React.FC<SentimentResultsProps> = ({ analysis, showTitle = true }) => {
   const formatPercentage = (percentage: number) => {
     return percentage.toFixed(1);
   };
@@ -43,16 +44,18 @@ const SentimentResults: React.FC<SentimentResultsProps> = ({ analysis }) => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <Card>
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-slate-800 mb-2">
-            Análisis de "{analysis.keyword}"
-          </h2>
-          <p className="text-slate-600">
-            {analysis.totalNews} noticias analizadas - {analysis.date}
-          </p>
-        </div>
-      </Card>
+      {showTitle && (
+        <Card>
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-slate-800 mb-2">
+              Análisis de "{analysis.keyword}"
+            </h2>
+            <p className="text-slate-600">
+              {analysis.totalNews} noticias analizadas - {analysis.date}
+            </p>
+          </div>
+        </Card>
+      )}
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
