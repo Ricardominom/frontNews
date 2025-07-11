@@ -133,7 +133,7 @@ const parsePercentage = (value?: string) => {
       >
         {selectedAnalysis && (
           <div className="p-6">
-            <SentimentResults analysis={selectedAnalysis} />
+            <SentimentResults analysis={selectedAnalysis} showTitle={false} />
           </div>
         )}
       </Modal>

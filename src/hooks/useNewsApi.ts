@@ -10,6 +10,7 @@ export const useNewsApi = () => {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
       dispatch({ type: 'SET_ERROR', payload: null });
+      dispatch({ type: 'SET_CURRENT_SEARCH_DATA', payload: data });
       
       const result = await newsApi.analyzeNews(data);
       dispatch({ type: 'SET_CURRENT_ANALYSIS', payload: result });

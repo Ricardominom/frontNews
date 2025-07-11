@@ -1,15 +1,16 @@
 import React from 'react';
-import { NewsAnalysis } from '../types';
+import { NewsAnalysis, AnalysisFormData } from '../types';
 import SentimentIcon from './SentimentIcon';
 import NewsCard from './NewsCard';
 import Card from './ui/Card';
 
 interface SentimentResultsProps {
   analysis: NewsAnalysis;
+  searchData?: AnalysisFormData | null;
   showTitle?: boolean;
 }
 
-const SentimentResults: React.FC<SentimentResultsProps> = ({ analysis, showTitle = true }) => {
+const SentimentResults: React.FC<SentimentResultsProps> = ({ analysis, searchData, showTitle = true }) => {
   const parsePercentage = (percentageString: string) => {
     if (!percentageString) return 0;
     return parseFloat(percentageString.replace('%', '')) || 0;
@@ -46,6 +47,17 @@ const SentimentResults: React.FC<SentimentResultsProps> = ({ analysis, showTitle
     return analysis.total_analizadas || analysis.total || 0;
   };
 
+  const getDisplayKeyword = () => {
+    return searchData?.keyword || analysis.keyword || 'Sin palabra clave';
+  };
+
+  const getDisplayDate = () => {
+    if (searchData?.date) {
+      return searchData.date === 'hoy' ? 'Hoy' : 'Ayer';
+    }
+    return analysis.date || 'Fecha no disponible';
+  };
+
   // Validación de datos del análisis
   if (!analysis) {
     return (
@@ -62,10 +74,10 @@ const SentimentResults: React.FC<SentimentResultsProps> = ({ analysis, showTitle
         <Card>
           <div className="text-center">
             <h2 className="text-2xl font-bold text-slate-800 mb-2">
-              Análisis de "{analysis.keyword || 'Sin palabra clave'}"
+              Análisis de "{getDisplayKeyword()}"
             </h2>
             <p className="text-slate-600">
-              {getTotalNews()} noticias analizadas - {analysis.date || 'Fecha no disponible'}
+              {getTotalNews()} noticias analizadas - {getDisplayDate()}
             </p>
           </div>
         </Card>
@@ -95,23 +107,25 @@ const SentimentResults: React.FC<SentimentResultsProps> = ({ analysis, showTitle
       <div className="space-y-8">
         {getSentimentData().map((sentiment) => (
           sentiment.news.length > 0 && (
-            <div key={sentiment.type}>
-              <div className="flex items-center space-x-2 mb-4">
-                <SentimentIcon sentiment={sentiment.type} className="w-5 h-5" />
-                <h3 className="text-lg font-semibold text-slate-800">
-                  Top 5 Noticias {sentiment.label}
-                </h3>
+            <Card key={sentiment.type}>
+              <div>
+                <div className="flex items-center space-x-2 mb-6">
+                  <SentimentIcon sentiment={sentiment.type} className="w-5 h-5" />
+                  <h3 className="text-lg font-semibold text-slate-800">
+                    Top 5 Noticias {sentiment.label}
+                  </h3>
+                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  {sentiment.news.slice(0, 5).map((news, index) => (
+                    <NewsCard 
+                      key={index} 
+                      news={news} 
+                      rank={index + 1}
+                    />
+                  ))}
+                </div>
               </div>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {sentiment.news.slice(0, 5).map((news, index) => (
-                  <NewsCard 
-                    key={index} 
-                    news={news} 
-                    rank={index + 1}
-                  />
-                ))}
-              </div>
-            </div>
+            </Card>
           )
         ))}
       </div>
