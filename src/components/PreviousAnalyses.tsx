@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Clock, TrendingUp } from 'lucide-react';
 import { useNews } from '../context/NewsContext';
 import { useNewsApi } from '../hooks/useNewsApi';
