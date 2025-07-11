@@ -25,7 +25,6 @@ export interface NewsItem {
 
 export interface AnalysisFormData {
   keyword: string;
-  date: 'hoy' | 'ayer';
 }
 
 export interface ApiResponse<T> {

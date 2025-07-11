@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Calendar } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { useNewsApi } from '../hooks/useNewsApi';
 import { useNews } from '../context/NewsContext';
 import { AnalysisFormData } from '../types';
@@ -8,8 +8,7 @@ import ErrorMessage from './ui/ErrorMessage';
 
 const AnalysisForm: React.FC = () => {
   const [formData, setFormData] = useState<AnalysisFormData>({
-    keyword: '',
-    date: 'hoy'
+    keyword: ''
   });
   const [formError, setFormError] = useState<string | null>(null);
   
@@ -65,26 +64,6 @@ const AnalysisForm: React.FC = () => {
             className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
             disabled={state.loading}
           />
-        </div>
-
-        <div className="space-y-2">
-          <label htmlFor="date" className="block text-sm font-medium text-slate-700">
-            Fecha de noticias
-          </label>
-          <div className="relative">
-            <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <select
-              id="date"
-              name="date"
-              value={formData.date}
-              onChange={handleInputChange}
-              className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors appearance-none bg-white"
-              disabled={state.loading}
-            >
-              <option value="hoy">Hoy</option>
-              <option value="ayer">Ayer</option>
-            </select>
-          </div>
         </div>
 
         {formError && (

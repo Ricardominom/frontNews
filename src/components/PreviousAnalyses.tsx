@@ -89,7 +89,7 @@ const parsePercentage = (value?: string) => {
                       {analysis.keyword}
                     </h4>
                     <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full">
-                      {analysis.date}
+                      Hoy
                     </span>
                   </div>
                   

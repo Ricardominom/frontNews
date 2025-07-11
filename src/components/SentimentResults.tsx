@@ -52,10 +52,7 @@ const SentimentResults: React.FC<SentimentResultsProps> = ({ analysis, searchDat
   };
 
   const getDisplayDate = () => {
-    if (searchData?.date) {
-      return searchData.date === 'hoy' ? 'Hoy' : 'Ayer';
-    }
-    return analysis.date || 'Fecha no disponible';
+    return 'Hoy';
   };
 
   // Validación de datos del análisis
