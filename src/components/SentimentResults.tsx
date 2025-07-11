@@ -10,36 +10,41 @@ interface SentimentResultsProps {
 }
 
 const SentimentResults: React.FC<SentimentResultsProps> = ({ analysis, showTitle = true }) => {
-  const formatPercentage = (percentage: number) => {
-    return (percentage || 0).toFixed(1);
+  const parsePercentage = (percentageString: string) => {
+    if (!percentageString) return 0;
+    return parseFloat(percentageString.replace('%', '')) || 0;
   };
 
   const getSentimentData = () => [
     {
       type: 'positive' as const,
       label: 'Positivas',
-      percentage: analysis.positivePercentage || 0,
-      news: analysis.positiveNews || [],
+      percentage: parsePercentage(analysis.porcentaje?.positivas || '0%'),
+      news: analysis.top_positivas || [],
       color: 'text-green-600',
       bgColor: 'bg-green-100'
     },
     {
       type: 'negative' as const,
       label: 'Negativas',
-      percentage: analysis.negativePercentage || 0,
-      news: analysis.negativeNews || [],
+      percentage: parsePercentage(analysis.porcentaje?.negativas || '0%'),
+      news: analysis.top_negativas || [],
       color: 'text-red-600',
       bgColor: 'bg-red-100'
     },
     {
       type: 'neutral' as const,
       label: 'Neutras',
-      percentage: analysis.neutralPercentage || 0,
-      news: analysis.neutralNews || [],
+      percentage: parsePercentage(analysis.porcentaje?.neutras || '0%'),
+      news: analysis.top_neutras || [],
       color: 'text-slate-600',
       bgColor: 'bg-slate-100'
     }
   ];
+
+  const getTotalNews = () => {
+    return analysis.total_analizadas || analysis.total || 0;
+  };
 
   // Validación de datos del análisis
   if (!analysis) {
@@ -60,7 +65,7 @@ const SentimentResults: React.FC<SentimentResultsProps> = ({ analysis, showTitle
               Análisis de "{analysis.keyword || 'Sin palabra clave'}"
             </h2>
             <p className="text-slate-600">
-              {analysis.totalNews || 0} noticias analizadas - {analysis.date || 'Fecha no disponible'}
+              {getTotalNews()} noticias analizadas - {analysis.date || 'Fecha no disponible'}
             </p>
           </div>
         </Card>
@@ -77,7 +82,7 @@ const SentimentResults: React.FC<SentimentResultsProps> = ({ analysis, showTitle
               {sentiment.label}
             </h3>
             <p className={`text-2xl font-bold ${sentiment.color}`}>
-              {formatPercentage(sentiment.percentage)}%
+              {sentiment.percentage.toFixed(1)}%
             </p>
             <p className="text-xs text-slate-500 mt-1">
               {sentiment.news.length} noticias

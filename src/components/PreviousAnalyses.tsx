@@ -29,10 +29,15 @@ const PreviousAnalyses: React.FC = () => {
   };
 
   const getDominantSentiment = (analysis: NewsAnalysis) => {
+    const parsePercentage = (value?: string) => {
+      if (!value) return 0;
+      return parseFloat(value.replace('%', '')) || 0;
+    };
+    
     const sentiments = [
-      { type: 'positive' as const, percentage: analysis.positivePercentage || 0 },
-      { type: 'negative' as const, percentage: analysis.negativePercentage || 0 },
-      { type: 'neutral' as const, percentage: analysis.neutralPercentage || 0 }
+      { type: 'positive' as const, percentage: parsePercentage(analysis.porcentaje?.positivas) },
+      { type: 'negative' as const, percentage: parsePercentage(analysis.porcentaje?.negativas) },
+      { type: 'neutral' as const, percentage: parsePercentage(analysis.porcentaje?.neutras) }
     ];
     
     return sentiments.reduce((max, current) => 
@@ -91,7 +96,7 @@ const parsePercentage = (value?: string) => {
                   <div className="flex items-center space-x-4 text-sm text-slate-600 mb-2">
                     <span className="flex items-center space-x-1">
                       <TrendingUp className="w-3 h-3" />
-                      <span>{analysis.totalNews} noticias</span>
+                      <span>{analysis.total_analizadas || analysis.total || 0} noticias</span>
                     </span>
                     <span className="flex items-center space-x-1">
                       <Clock className="w-3 h-3" />
@@ -102,15 +107,15 @@ const parsePercentage = (value?: string) => {
                   <div className="flex items-center space-x-4 text-xs">
                     <span className="flex items-center space-x-1">
                       <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span>Positivo: {parsePercentage(analysis.porcentaje?.positivas).toFixed(2)}%</span>
+                      <span>Positivo: {analysis.porcentaje?.positivas || '0%'}</span>
                     </span>
                     <span className="flex items-center space-x-1">
                       <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                      <span>Negativo: {parsePercentage(analysis.porcentaje?.negativas).toFixed(2)}%</span>
+                      <span>Negativo: {analysis.porcentaje?.negativas || '0%'}</span>
                     </span>
                     <span className="flex items-center space-x-1">
                       <div className="w-2 h-2 bg-slate-400 rounded-full"></div>
-                      <span>Neutro: {parsePercentage(analysis.porcentaje?.neutras).toFixed(2)}%</span>
+                      <span>Neutro: {analysis.porcentaje?.neutras || '0%'}</span>
                     </span>
                   </div>
                 </div>

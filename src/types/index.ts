@@ -2,15 +2,13 @@ export interface NewsAnalysis {
   _id: string;
   keyword: string;
   date: string;
-  totalNews: number;
-  positivePercentage: number;
-  negativePercentage: number;
-  neutralPercentage: number;
-  positiveNews: NewsItem[];
-  negativeNews: NewsItem[];
-  neutralNews: NewsItem[];
+  total?: number;
+  total_analizadas?: number;
+  top_positivas: NewsItem[];
+  top_negativas: NewsItem[];
+  top_neutras: NewsItem[];
   createdAt: string;
-  porcentaje?: {
+  porcentaje: {
     positivas: string;
     negativas: string;
     neutras: string;
