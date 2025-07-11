@@ -11,35 +11,44 @@ interface SentimentResultsProps {
 
 const SentimentResults: React.FC<SentimentResultsProps> = ({ analysis, showTitle = true }) => {
   const formatPercentage = (percentage: number) => {
-    return percentage.toFixed(1);
+    return (percentage || 0).toFixed(1);
   };
 
   const getSentimentData = () => [
     {
       type: 'positive' as const,
       label: 'Positivas',
-      percentage: analysis.positivePercentage,
-      news: analysis.positiveNews,
+      percentage: analysis.positivePercentage || 0,
+      news: analysis.positiveNews || [],
       color: 'text-green-600',
       bgColor: 'bg-green-100'
     },
     {
       type: 'negative' as const,
       label: 'Negativas',
-      percentage: analysis.negativePercentage,
-      news: analysis.negativeNews,
+      percentage: analysis.negativePercentage || 0,
+      news: analysis.negativeNews || [],
       color: 'text-red-600',
       bgColor: 'bg-red-100'
     },
     {
       type: 'neutral' as const,
       label: 'Neutras',
-      percentage: analysis.neutralPercentage,
-      news: analysis.neutralNews,
+      percentage: analysis.neutralPercentage || 0,
+      news: analysis.neutralNews || [],
       color: 'text-slate-600',
       bgColor: 'bg-slate-100'
     }
   ];
+
+  // Validación de datos del análisis
+  if (!analysis) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-slate-500">No hay datos de análisis disponibles</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -48,10 +57,10 @@ const SentimentResults: React.FC<SentimentResultsProps> = ({ analysis, showTitle
         <Card>
           <div className="text-center">
             <h2 className="text-2xl font-bold text-slate-800 mb-2">
-              Análisis de "{analysis.keyword}"
+              Análisis de "{analysis.keyword || 'Sin palabra clave'}"
             </h2>
             <p className="text-slate-600">
-              {analysis.totalNews} noticias analizadas - {analysis.date}
+              {analysis.totalNews || 0} noticias analizadas - {analysis.date || 'Fecha no disponible'}
             </p>
           </div>
         </Card>

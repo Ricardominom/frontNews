@@ -30,9 +30,9 @@ const PreviousAnalyses: React.FC = () => {
 
   const getDominantSentiment = (analysis: NewsAnalysis) => {
     const sentiments = [
-      { type: 'positive' as const, percentage: analysis.positivePercentage },
-      { type: 'negative' as const, percentage: analysis.negativePercentage },
-      { type: 'neutral' as const, percentage: analysis.neutralPercentage }
+      { type: 'positive' as const, percentage: analysis.positivePercentage || 0 },
+      { type: 'negative' as const, percentage: analysis.negativePercentage || 0 },
+      { type: 'neutral' as const, percentage: analysis.neutralPercentage || 0 }
     ];
     
     return sentiments.reduce((max, current) => 
