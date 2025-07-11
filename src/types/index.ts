@@ -10,6 +10,11 @@ export interface NewsAnalysis {
   negativeNews: NewsItem[];
   neutralNews: NewsItem[];
   createdAt: string;
+  porcentaje?: {
+    positivas: string;
+    negativas: string;
+    neutras: string;
+  };
 }
 
 export interface NewsItem {

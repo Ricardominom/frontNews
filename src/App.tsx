@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import { NewsProvider } from './context/NewsContext';
 import { useNews } from './context/NewsContext';
 import Header from './components/Header';
-import AnalysisForm from './components/AnalysisForm';
-import SentimentResults from './components/SentimentResults';
-import PreviousAnalyses from './components/PreviousAnalyses';
+import HomePage from './pages/HomePage';
+import PreviousAnalysesPage from './pages/PreviousAnalysesPage';
 
 const AppContent: React.FC = () => {
-  const { state, fetchPreviousAnalyses } = useNews();
+  const { fetchPreviousAnalyses } = useNews();
 
   useEffect(() => {
     // Only fetch previous analyses if we're not in development or if explicitly needed
@@ -24,24 +24,10 @@ const AppContent: React.FC = () => {
       <Header />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="space-y-8">
-          {/* Analysis Form */}
-          <div className="max-w-2xl mx-auto">
-            <AnalysisForm />
-          </div>
-
-          {/* Results */}
-          {state.currentAnalysis && (
-            <div className="animate-fade-in">
-              <SentimentResults analysis={state.currentAnalysis} />
-            </div>
-          )}
-
-          {/* Previous Analyses */}
-          <div className="max-w-4xl mx-auto">
-            <PreviousAnalyses />
-          </div>
-        </div>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/analisis-previos" element={<PreviousAnalysesPage />} />
+        </Routes>
       </main>
     </div>
   );
