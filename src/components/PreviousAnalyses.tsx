@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Clock, TrendingUp } from 'lucide-react';
+import { Clock, TrendingUp, Calendar, Filter } from 'lucide-react';
 import { useNews } from '../context/NewsContext';
 import { useNewsApi } from '../hooks/useNewsApi';
 import { NewsAnalysis } from '../types';
@@ -12,10 +12,27 @@ const PreviousAnalyses: React.FC = () => {
   const { state } = useNews();
   const { fetchPreviousAnalyses } = useNewsApi();
   const [selectedAnalysis, setSelectedAnalysis] = useState<NewsAnalysis | null>(null);
+  const [dateFilter, setDateFilter] = useState<string>('');
+  const [filteredAnalyses, setFilteredAnalyses] = useState<NewsAnalysis[]>([]);
 
   useEffect(() => {
     fetchPreviousAnalyses();
   }, [fetchPreviousAnalyses]);
+
+  useEffect(() => {
+    if (!dateFilter) {
+      setFilteredAnalyses(state.previousAnalyses);
+    } else {
+      const filtered = state.previousAnalyses.filter(analysis => {
+        const analysisDate = new Date(analysis.createdAt);
+        const filterDate = new Date(dateFilter);
+        
+        // Comparar solo la fecha (sin hora)
+        return analysisDate.toDateString() === filterDate.toDateString();
+      });
+      setFilteredAnalyses(filtered);
+    }
+  }, [state.previousAnalyses, dateFilter]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -26,6 +43,29 @@ const PreviousAnalyses: React.FC = () => {
       hour: '2-digit',
       minute: '2-digit'
     });
+  };
+
+  const formatDateForInput = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0];
+  };
+
+  const getDateLabel = (dateString: string) => {
+    const date = new Date(dateString);
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    if (date.toDateString() === today.toDateString()) {
+      return 'Hoy';
+    } else if (date.toDateString() === yesterday.toDateString()) {
+      return 'Ayer';
+    } else {
+      return date.toLocaleDateString('es-ES', {
+        day: 'numeric',
+        month: 'short'
+      });
+    }
   };
 
   const getDominantSentiment = (analysis: NewsAnalysis) => {
@@ -53,6 +93,14 @@ const PreviousAnalyses: React.FC = () => {
     setSelectedAnalysis(null);
   };
 
+  const handleDateFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDateFilter(e.target.value);
+  };
+
+  const clearDateFilter = () => {
+    setDateFilter('');
+  };
+
   if (state.previousAnalyses.length === 0) {
     return (
       <Card title="Análisis Previos">
@@ -64,15 +112,72 @@ const PreviousAnalyses: React.FC = () => {
     );
   }
 
-const parsePercentage = (value?: string) => {
-  if (!value) return 0;
-  return parseFloat(value.replace('%', '')) || 0;
-};
+  const parsePercentage = (value?: string) => {
+    if (!value) return 0;
+    return parseFloat(value.replace('%', '')) || 0;
+  };
 
   return (
-    <Card title="Análisis Previos">
-      <div className="space-y-3">
-        {state.previousAnalyses.map((analysis) => {
+    <Card>
+      <div className="space-y-6">
+        {/* Header with filter */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+          <div className="flex items-center space-x-2">
+            <Clock className="w-5 h-5 text-slate-600" />
+            <h3 className="text-lg font-semibold text-slate-800">Análisis Previos</h3>
+          </div>
+          
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2">
+              <Calendar className="w-4 h-4 text-slate-500" />
+              <input
+                type="date"
+                value={dateFilter}
+                onChange={handleDateFilterChange}
+                className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            {dateFilter && (
+              <button
+                onClick={clearDateFilter}
+                className="text-sm text-slate-500 hover:text-slate-700 underline"
+              >
+                Limpiar
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Results count */}
+        <div className="flex items-center justify-between text-sm text-slate-600">
+          <span>
+            {filteredAnalyses.length} análisis encontrados
+            {dateFilter && (
+              <span className="ml-2 text-blue-600">
+                para {new Date(dateFilter).toLocaleDateString('es-ES', {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric'
+                })}
+              </span>
+            )}
+          </span>
+        </div>
+
+        {/* Analysis list */}
+        {filteredAnalyses.length === 0 ? (
+          <div className="text-center py-8">
+            <Filter className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+            <p className="text-slate-500">
+              {dateFilter 
+                ? 'No se encontraron análisis para la fecha seleccionada'
+                : 'No hay análisis disponibles'
+              }
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {filteredAnalyses.map((analysis) => {
           const dominantSentiment = getDominantSentiment(analysis);
           
           return (
@@ -89,7 +194,7 @@ const parsePercentage = (value?: string) => {
                       {analysis.keyword}
                     </h4>
                     <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full">
-                      Hoy
+                      {getDateLabel(analysis.createdAt)}
                     </span>
                   </div>
                   
@@ -122,7 +227,9 @@ const parsePercentage = (value?: string) => {
               </div>
             </div>
           );
-        })}
+            })}
+          </div>
+        )}
       </div>
 
       {/* Modal for detailed analysis */}
