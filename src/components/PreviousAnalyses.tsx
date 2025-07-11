@@ -1,0 +1,114 @@
+import React, { useEffect } from 'react';
+import { Clock, TrendingUp } from 'lucide-react';
+import { useNews } from '../context/NewsContext';
+import { useNewsApi } from '../hooks/useNewsApi';
+import { NewsAnalysis } from '../types';
+import Card from './ui/Card';
+import SentimentIcon from './SentimentIcon';
+
+const PreviousAnalyses: React.FC = () => {
+  const { state } = useNews();
+  const { fetchPreviousAnalyses } = useNewsApi();
+
+  useEffect(() => {
+    fetchPreviousAnalyses();
+  }, [fetchPreviousAnalyses]);
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const getDominantSentiment = (analysis: NewsAnalysis) => {
+    const sentiments = [
+      { type: 'positive' as const, percentage: analysis.positivePercentage },
+      { type: 'negative' as const, percentage: analysis.negativePercentage },
+      { type: 'neutral' as const, percentage: analysis.neutralPercentage }
+    ];
+    
+    return sentiments.reduce((max, current) => 
+      current.percentage > max.percentage ? current : max
+    );
+  };
+
+  if (state.previousAnalyses.length === 0) {
+    return (
+      <Card title="Análisis Previos">
+        <div className="text-center py-8">
+          <Clock className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+          <p className="text-slate-500">No hay análisis previos disponibles</p>
+        </div>
+      </Card>
+    );
+  }
+
+const parsePercentage = (value?: string) => {
+  if (!value) return 0;
+  return parseFloat(value.replace('%', '')) || 0;
+};
+
+  return (
+    <Card title="Análisis Previos">
+      <div className="space-y-3">
+        {state.previousAnalyses.map((analysis) => {
+          const dominantSentiment = getDominantSentiment(analysis);
+          
+          return (
+            <div 
+              key={analysis._id} 
+              className="p-4 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors"
+            >
+              <div className="flex items-start justify-between space-x-4">
+                <div className="flex-1">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <SentimentIcon sentiment={dominantSentiment.type} className="w-4 h-4" />
+                    <h4 className="font-medium text-slate-800">
+                      {analysis.keyword}
+                    </h4>
+                    <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full">
+                      {analysis.date}
+                    </span>
+                  </div>
+                  
+                  <div className="flex items-center space-x-4 text-sm text-slate-600 mb-2">
+                    <span className="flex items-center space-x-1">
+                      <TrendingUp className="w-3 h-3" />
+                      <span>{analysis.totalNews} noticias</span>
+                    </span>
+                    <span className="flex items-center space-x-1">
+                      <Clock className="w-3 h-3" />
+                      <span>{formatDate(analysis.createdAt)}</span>
+                    </span>
+                  </div>
+
+                  <div className="flex items-center space-x-4 text-xs">
+                    <span className="flex items-center space-x-1">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span>Positivo: {parsePercentage(analysis.porcentaje?.positivas).toFixed(2)}%</span>
+                    </span>
+                    <span className="flex items-center space-x-1">
+                      <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                      <span>Negativo: {parsePercentage(analysis.porcentaje?.negativas).toFixed(2)}%</span>
+                    </span>
+                    <span className="flex items-center space-x-1">
+                      <div className="w-2 h-2 bg-slate-400 rounded-full"></div>
+                      <span>Neutro: {parsePercentage(analysis.porcentaje?.neutras).toFixed(2)}%</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </Card>
+  );
+};
+
+export default PreviousAnalyses;
